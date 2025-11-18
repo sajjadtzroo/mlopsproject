@@ -65,3 +65,13 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Airflow
+airflow/logs/
+airflow/*.db
+airflow/*.db-shm
+airflow/*.db-wal
+airflow/airflow.cfg
+airflow/webserver_config.py
+airflow/*.pid
+airflow/standalone_admin_password.txt

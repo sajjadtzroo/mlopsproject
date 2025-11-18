@@ -1,28 +1,39 @@
 # MLOps Project: Titanic Survival Prediction
 
-An educational MLOps project demonstrating best practices for machine learning workflows using MLflow, scikit-learn, and Random Forest.
+An educational MLOps project demonstrating best practices for machine learning workflows using MLflow, Apache Airflow, scikit-learn, and multiple ML models.
 
 ## 📋 Project Structure
 
 ```
 mlopsproject/
 ├── data/
-│   ├── raw/                    # Raw data storage
-│   └── processed/              # Processed data storage
+│   ├── raw/                         # Raw data storage
+│   └── processed/                   # Processed data storage
 ├── src/
-│   ├── components/             # ML components
-│   │   ├── data_ingestion.py  # Data loading from seaborn
-│   │   ├── data_processing.py # Feature engineering & preprocessing
-│   │   └── model_training.py  # Model training with MLflow
+│   ├── components/                  # ML components
+│   │   ├── data_ingestion.py       # Data loading from seaborn
+│   │   ├── data_processing.py      # Feature engineering & preprocessing
+│   │   ├── multi_model_training.py # Multi-model training with MLflow
+│   │   └── clustering_models.py    # Clustering algorithms
 │   └── pipeline/
-│       └── training_pipeline.py # End-to-end pipeline orchestration
-├── mlruns/                     # MLflow tracking data
-├── logs/                       # Application logs
-├── .env                        # Environment variables
-├── requirements.txt            # Python dependencies
-├── pyproject.toml             # Black & isort configuration
-├── main.py                    # Main entry point
-└── generate_sample_data.py    # Sample data generation
+│       └── complete_ml_pipeline.py  # End-to-end pipeline orchestration
+├── airflow/
+│   ├── dags/                        # Airflow DAG definitions
+│   │   ├── data_ingestion_dag.py   # Data ingestion workflow
+│   │   └── ml_pipeline_dag.py      # Complete ML pipeline workflow
+│   ├── logs/                        # Airflow execution logs
+│   ├── plugins/                     # Custom Airflow plugins
+│   └── config/                      # Airflow configuration
+├── scripts/
+│   ├── init_airflow.sh             # Initialize Airflow
+│   ├── start_airflow.sh            # Start Airflow services
+│   └── stop_airflow.sh             # Stop Airflow services
+├── mlruns/                          # MLflow tracking data
+├── docker-compose.yml               # Docker orchestration
+├── .env                             # Environment variables
+├── requirements.txt                 # Python dependencies
+├── main.py                          # Main entry point
+└── AIRFLOW_SETUP.md                 # Airflow setup guide
 ```
 
 ## 🚀 Quick Start
@@ -43,7 +54,8 @@ This will:
 - Load Titanic dataset from seaborn
 - Clean and process the data
 - Engineer features
-- Train a Random Forest model
+- Train 8 classification models (Logistic Regression, Decision Tree, Random Forest, Gradient Boosting, XGBoost, SVM, KNN, Naive Bayes)
+- Perform clustering analysis (K-Means, Hierarchical)
 - Track everything in MLflow
 
 ### 3. View MLflow UI
@@ -53,6 +65,54 @@ mlflow ui --backend-store-uri ./mlruns
 ```
 
 Then open http://localhost:5000 in your browser.
+
+## 🔄 Airflow Orchestration
+
+This project includes Apache Airflow for orchestrating ML workflows. See [AIRFLOW_SETUP.md](AIRFLOW_SETUP.md) for detailed setup instructions.
+
+### Quick Setup - Local
+
+```bash
+# Initialize Airflow
+./scripts/init_airflow.sh
+
+# Start Airflow services
+./scripts/start_airflow.sh
+
+# Access Airflow UI at http://localhost:8080
+# Login: admin / admin
+```
+
+### Quick Setup - Docker
+
+```bash
+# Start all services (Airflow + MLflow)
+docker-compose up -d
+
+# Access services:
+# - Airflow UI: http://localhost:8080 (admin/admin)
+# - MLflow UI: http://localhost:5000
+```
+
+### Available DAGs
+
+1. **Data Ingestion Pipeline** (`data_ingestion_pipeline`)
+   - Schedule: Daily
+   - Tasks: Ingest and validate Titanic dataset
+
+2. **Complete ML Pipeline** (`complete_ml_pipeline`)
+   - Schedule: Weekly
+   - Tasks: Data ingestion → Processing → Multi-model training → Clustering → Report generation
+
+### Trigger DAGs Manually
+
+```bash
+# Trigger data ingestion
+airflow dags trigger data_ingestion_pipeline
+
+# Trigger complete ML pipeline
+airflow dags trigger complete_ml_pipeline
+```
 
 ## 📊 Components
 
@@ -138,14 +198,18 @@ This project demonstrates:
 
 1. **Component-Based Architecture**: Modular, reusable components
 2. **MLflow Integration**: Experiment tracking and model registry
-3. **Configuration Management**: Environment variables via .env
-4. **Code Quality**: Black and isort for consistent formatting
-5. **Logging**: Comprehensive logging throughout pipeline
-6. **Best Practices**:
+3. **Airflow Orchestration**: Workflow scheduling and monitoring with DAGs
+4. **Multi-Model Training**: Training and comparing 8+ ML models
+5. **Configuration Management**: Environment variables via .env
+6. **Code Quality**: Black and isort for consistent formatting
+7. **Containerization**: Docker Compose for reproducible deployments
+8. **Logging**: Comprehensive logging throughout pipeline
+9. **Best Practices**:
    - Type hints
    - Docstrings
    - Error handling
    - Separation of concerns
+   - Pipeline orchestration
 
 ## 📝 Running Individual Components
 
@@ -178,12 +242,16 @@ python src/components/model_training.py
 
 ## 📚 Next Steps
 
-1. Experiment with different hyperparameters in `.env`
-2. Try different models (Logistic Regression, XGBoost, etc.)
-3. Add cross-validation
-4. Implement model serving with MLflow
-5. Add unit tests
-6. Set up CI/CD pipeline
+1. Set up Airflow for automated pipeline execution (see [AIRFLOW_SETUP.md](AIRFLOW_SETUP.md))
+2. Experiment with different hyperparameters in `.env`
+3. Configure DAG schedules for your use case
+4. Add email notifications for Airflow task failures
+5. Implement model serving with MLflow
+6. Add cross-validation to model training
+7. Set up data quality checks in Airflow
+8. Add unit tests
+9. Set up CI/CD pipeline
+10. Deploy with Docker Compose in production
 
 ## 🤝 Contributing
 
